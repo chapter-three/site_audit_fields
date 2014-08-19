@@ -1,0 +1,13 @@
+
+# Ignore composer related components # 
+######################################
+/composer.lock
+/vendor
+
+# File System Files #
+#####################
+.DS_Store
+
+# IDE Files #
+#############
+.idea
