@@ -184,12 +184,23 @@ class SiteAuditCheckFieldsFieldUsage extends SiteAuditFieldsSiteAuditCheckAbstra
     }
 
     $nl = chr(10);
-    foreach ($field_usage as $entity_type=>$bundle_names) {
+
+    // First sort entity types by name.
+    ksort($field_usage);
+
+    foreach ($field_usage as $entity_type=>&$bundle_names) {
+      // Sort bundles by name.
+      ksort($bundle_names);
+
       $output.=     "{$entity_type}{$nl}";
       $output.=     "=============={$nl}";
       $output.=     "| Field Name            | Usage Count      | {$nl}";
       $output.=     "| :-------------------: | ---------------- | {$nl}";
-      foreach ($bundle_names as $bundle_name=>$field_names) {
+      foreach ($bundle_names as $bundle_name=>&$field_names) {
+
+        // Sort fields by name.
+        ksort($field_names);
+
         // Get a node count for this entity.
         $node_count = $this->getNodeCount($entity_type, $bundle_name);
 
