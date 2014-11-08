@@ -134,6 +134,11 @@ class SiteAuditCheckFieldsFieldCount extends SiteAuditFieldsSiteAuditCheckAbstra
   }
 }
 
+/**
+ * Class SiteAuditCheckFieldsFieldUsage
+ *
+ * @todo add field type
+ */
 class SiteAuditCheckFieldsFieldUsage extends SiteAuditFieldsSiteAuditCheckAbstract {
   protected $fieldCount = FALSE;
   protected $label = 'Field Usage';
@@ -178,7 +183,7 @@ class SiteAuditCheckFieldsFieldUsage extends SiteAuditFieldsSiteAuditCheckAbstra
           $field_count = $query->execute();
 
           // Get the number of fields stored for this bundle.
-          $field_usage[$entity_type][$bundle_name][$field_name] = is_numeric($field_count) ? $field_count : 'n/q';
+          $field_usage[$entity_type][$bundle_name][$field_name] = is_numeric($field_count) ? $field_count : 'n/a';
         }
       }
     }
@@ -194,8 +199,8 @@ class SiteAuditCheckFieldsFieldUsage extends SiteAuditFieldsSiteAuditCheckAbstra
 
       $output.=     "{$entity_type}{$nl}";
       $output.=     "=============={$nl}";
-      $output.=     "| Field Name            | Usage Count      | {$nl}";
-      $output.=     "| :-------------------: | ---------------- | {$nl}";
+      $output.=     "| Field Name            | Field Type            | Usage Count      | {$nl}";
+      $output.=     "| :-------------------: | --------------------- | ---------------- | {$nl}";
       foreach ($bundle_names as $bundle_name=>&$field_names) {
 
         // Sort fields by name.
@@ -204,9 +209,14 @@ class SiteAuditCheckFieldsFieldUsage extends SiteAuditFieldsSiteAuditCheckAbstra
         // Get a node count for this entity.
         $node_count = $this->getNodeCount($entity_type, $bundle_name);
 
-        $output.=   "|+g **{$bundle_name}**  |+g  {$node_count} | {$nl}";
+        $node_count = $this->getNodeCount($entity_type, $bundle_name);
+
+        $output.=   "|+g **{$bundle_name}**  |+g                     |+g  {$node_count} | {$nl}";
         foreach ($field_names as $field_name=>$count) {
-          $output.= "| {$field_name}         | {$count}         | {$nl}";
+          // Get the field type fro this field.
+          $field_info = field_info_field($field_name);
+
+          $output.= "| {$field_name}         | {$field_info['type']} | {$count}         | {$nl}";
         }
         $output.=   "{$nl}{$nl}";
         $output.= "{$nl}";
