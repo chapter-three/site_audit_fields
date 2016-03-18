@@ -8,6 +8,7 @@ class SiteAuditReportFields extends SiteAuditReportAbstract {
     return dt('Fields');
   }
 }
+
 abstract class SiteAuditFieldsSiteAuditCheckAbstract extends SiteAuditCheckAbstract {
   protected $module = 'site_audit_fields';
   protected $check;
@@ -38,6 +39,9 @@ abstract class SiteAuditFieldsSiteAuditCheckAbstract extends SiteAuditCheckAbstr
 
   /**
    * Format the output for the test result.
+   *
+   * @param $result_type string
+   * @return string
    */
   protected function formatResult($result_type) {
     // Get a sipmle string output.
@@ -193,6 +197,8 @@ class SiteAuditCheckFieldsFieldUsage extends SiteAuditFieldsSiteAuditCheckAbstra
     // First sort entity types by name.
     ksort($field_usage);
 
+    $output = '';
+
     foreach ($field_usage as $entity_type=>&$bundle_names) {
       // Sort bundles by name.
       ksort($bundle_names);
@@ -209,8 +215,6 @@ class SiteAuditCheckFieldsFieldUsage extends SiteAuditFieldsSiteAuditCheckAbstra
         // Get a node count for this entity.
         $node_count = $this->getNodeCount($entity_type, $bundle_name);
 
-        $node_count = $this->getNodeCount($entity_type, $bundle_name);
-
         $output.=   "|+g **{$bundle_name}**  |+g                     |+g  {$node_count} | {$nl}";
         foreach ($field_names as $field_name=>$count) {
           // Get the field type fro this field.
@@ -218,15 +222,16 @@ class SiteAuditCheckFieldsFieldUsage extends SiteAuditFieldsSiteAuditCheckAbstra
 
           $output.= "| {$field_name}         | {$field_info['type']} | {$count}         | {$nl}";
         }
-        $output.=   "{$nl}{$nl}";
-        $output.= "{$nl}";
       }
     }
+
+    // Seeing some extra line breaks in the output. Strip them out.
+//    $output = preg_replace('/[\n\r]+/', $nl, $output);
 
     if (drush_get_option('html')) {
 
       // Load up a markdown parser.
-      require_once 'vendor/autoload.php';
+      require_once __DIR__ . '/vendor/autoload.php';
       $Parsedown = new Parsedown();
 
       // Process markdown and add bootstrap classes.
@@ -238,8 +243,13 @@ class SiteAuditCheckFieldsFieldUsage extends SiteAuditFieldsSiteAuditCheckAbstra
     return $output;
   }
 
+
   /**
    * Creates a report on how fields are used in a site.
+   *
+   * @param $entity_type
+   * @param $bundle_name
+   * @return string
    */
   protected function getNodeCount($entity_type, $bundle_name) {
     if ($entity_type == 'node') {
